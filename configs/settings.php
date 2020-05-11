@@ -12,6 +12,17 @@ $settings['error_handler_middleware'] = [
     'log_errors' => true,
     'log_error_details' => true,
 ];
+$settings['db'] = [
+    'username' => '',
+    'password' => '',
+    'host' => $settings['root'] . DIRECTORY_SEPARATOR . 'db',
+    'database' => 'visits.db',
+    'flags' => [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => true,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 
+    ],
+];
 
 return $settings;
