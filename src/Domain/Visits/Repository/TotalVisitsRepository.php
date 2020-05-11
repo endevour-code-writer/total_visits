@@ -2,6 +2,7 @@
 
 namespace Domain\Visits\Repository;
 
+use Domain\Visits\Logger;
 use PDO;
 
 class TotalVisitsRepository
@@ -9,13 +10,17 @@ class TotalVisitsRepository
     /** @var PDO  */
     private PDO $connection;
 
+    /** @var Logger  */
+    private Logger $logger;
+
     /**
      * TotalVisitsRepository constructor.
      * @param PDO $connection
      */
-    public function __construct(PDO $connection)
+    public function __construct(PDO $connection, Logger $logger)
     {
         $this->connection = $connection;
+        $this->logger = $logger;
     }
 
     /**
@@ -35,7 +40,7 @@ class TotalVisitsRepository
 
             $this->connection->commit();
         } catch (\Exception $exception) {
-            $exception->getMessage();
+            $this->logger->log($exception->getMessage());
             $this->connection->rollBack();
             return [];
         }
