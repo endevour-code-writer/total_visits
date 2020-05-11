@@ -2,11 +2,27 @@
 
 namespace Actions;
 
+use Domain\Visits\Entities\TotalVisits;
+use Domain\Visits\Services\TotalVisitsCounter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class IndexAction
 {
+    private const TOTAL_VISITS_ID = 1;
+
+    /** @var TotalVisitsCounter $totalVisitsCounter*/
+    private TotalVisitsCounter $totalVisitsCounter;
+
+    /**
+     * IndexAction constructor.
+     * @param TotalVisitsCounter $totalVisitsCounter
+     */
+    public function __construct(TotalVisitsCounter $totalVisitsCounter)
+    {
+        $this->totalVisitsCounter = $totalVisitsCounter;
+    }
+
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -14,8 +30,15 @@ class IndexAction
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $totalVisits = 0;
-        $response->getBody()->write("This page has been visited by {$totalVisits} people");
+        /** @var TotalVisits $totalVisits */
+        $totalVisits = $this->totalVisitsCounter->updateCountAndGetLastValueById(self::TOTAL_VISITS_ID);
+
+        if (! (bool) $totalVisits) {
+            $totalVisits = $this->totalVisitsCounter->getTotalCountsById(self::TOTAL_VISITS_ID);
+        }
+
+
+        $response->getBody()->write("This page has been visited by {$totalVisits['visits']} people");
 
         return $response;
     }
